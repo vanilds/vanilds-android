@@ -31,11 +31,11 @@ Locally (JDK 17 + Android SDK, e.g. in a Codespace):
 ./gradlew assembleDebug
 ```
 
-## Before publishing on Google Play
+## Publishing
 
-- Create an upload key and sign the release build with it (today `release` uses the debug key).
-- Google Play needs an Android App Bundle: `./gradlew bundleRelease`.
-- Replace the placeholder icon (`app/src/main/res/drawable/ic_launcher_foreground.xml`).
+Google Play needs a signed App Bundle. CI builds it on main once the upload key secrets exist;
+the full checklist (key, Play Console, store listing, closed test) is in
+[docs/play-store.md](docs/play-store.md). Privacy policy: [PRIVACY.md](PRIVACY.md).
 
 ## Known limits
 

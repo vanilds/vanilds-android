@@ -3,6 +3,11 @@ plugins {
     id("org.jetbrains.kotlin.android")
 }
 
+// Release signing: the upload key comes from environment variables (GitHub Actions
+// secrets), never from the repo. Without them the release build is left unsigned.
+val uploadKeystore = System.getenv("ANDROID_UPLOAD_KEYSTORE")?.let { file(it) }
+val signRelease = uploadKeystore?.exists() == true
+
 android {
     namespace = "io.github.vanilds.app"
     compileSdk = 36
@@ -11,16 +16,28 @@ android {
         applicationId = "io.github.vanilds.app"
         minSdk = 26
         targetSdk = 36
-        versionCode = 1
+        // Every CI run gets a higher versionCode (Play rejects a reused one).
+        versionCode = System.getenv("GITHUB_RUN_NUMBER")?.toInt() ?: 1
         versionName = "1.0.0"
+    }
+
+    signingConfigs {
+        if (signRelease) {
+            create("upload") {
+                storeFile = uploadKeystore
+                storePassword = System.getenv("ANDROID_UPLOAD_STORE_PASSWORD")
+                keyAlias = System.getenv("ANDROID_UPLOAD_KEY_ALIAS") ?: "upload"
+                keyPassword = System.getenv("ANDROID_UPLOAD_KEY_PASSWORD")
+                    ?: System.getenv("ANDROID_UPLOAD_STORE_PASSWORD")
+            }
+        }
     }
 
     buildTypes {
         release {
             isMinifyEnabled = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"))
-            // Signed with the debug key until a real upload key exists (see mobile/README.md).
-            signingConfig = signingConfigs.getByName("debug")
+            if (signRelease) signingConfig = signingConfigs.getByName("upload")
         }
     }
 

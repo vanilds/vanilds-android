@@ -28,3 +28,41 @@ jobs:
             app/build/outputs/apk/debug/*.apk
             app/build/outputs/apk/release/*.apk
           if-no-files-found: error
+
+  # Signed App Bundle for Google Play. Runs on main (and by hand) once the upload key
+  # secrets exist; pull requests never see the secrets.
+  release:
+    needs: build
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    env:
+      HAS_KEY: ${{ secrets.ANDROID_UPLOAD_KEYSTORE_BASE64 != '' }}
+    steps:
+      - name: Skip without an upload key
+        if: env.HAS_KEY != 'true'
+        run: echo "::notice::No ANDROID_UPLOAD_KEYSTORE_BASE64 secret, so no signed bundle. See README, 'Publishing'."
+      - uses: actions/checkout@v4
+        if: env.HAS_KEY == 'true'
+      - uses: actions/setup-java@v4
+        if: env.HAS_KEY == 'true'
+        with:
+          distribution: temurin
+          java-version: 17
+      - uses: gradle/actions/setup-gradle@v4
+        if: env.HAS_KEY == 'true'
+      - name: Build signed bundle
+        if: env.HAS_KEY == 'true'
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_UPLOAD_KEYSTORE_BASE64 }}
+          ANDROID_UPLOAD_STORE_PASSWORD: ${{ secrets.ANDROID_UPLOAD_STORE_PASSWORD }}
+        run: |
+          export ANDROID_UPLOAD_KEYSTORE="$RUNNER_TEMP/upload.jks"
+          printf '%s' "$KEYSTORE_BASE64" | base64 -d > "$ANDROID_UPLOAD_KEYSTORE"
+          ./gradlew --no-daemon bundleRelease
+          rm -f "$ANDROID_UPLOAD_KEYSTORE"
+      - uses: actions/upload-artifact@v4
+        if: env.HAS_KEY == 'true'
+        with:
+          name: play-bundle
+          path: app/build/outputs/bundle/release/*.aab
+          if-no-files-found: error
