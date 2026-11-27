@@ -1,0 +1,6 @@
+<resources>
+    <style name="Theme.Vanilds" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/navy</item>
+        <item name="android:colorAccent">@color/orange</item>
+    </style>
+</resources>
