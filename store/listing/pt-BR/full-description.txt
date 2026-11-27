@@ -1,0 +1,16 @@
+Portfólio de Vani Santos, Engenheira de Software Front-end Sênior especializada em Angular, TypeScript e microfrontends para o setor financeiro.
+
+No app você encontra:
+• Perfil, experiência e currículo em português e inglês.
+• CreditDesk, um demo de back-office bancário para propostas de crédito e renegociação de dívidas, feito do zero para mostrar a arquitetura de ponta a ponta.
+
+Sobre o CreditDesk:
+• Front-end em Angular com microfrontends (Native Federation).
+• API em Java 21 e Spring Boot, com login via Keycloak (OIDC + PKCE), perfis de analista, gerente e auditor, trilha de auditoria e controle de concorrência.
+• Eventos com RabbitMQ e um worker em Python (LangGraph) que redige um parecer de crédito com IA a partir de dados mascarados.
+• Upload de documentos para o Amazon S3 com URLs pré-assinadas.
+• Roda em Kubernetes (k3s) na AWS, com Argo CD, TLS e monitoramento no Grafana Cloud.
+
+O demo usa apenas dados fictícios e contas de demonstração. Ele fica no ar em dias úteis, das 8h às 20h (horário de Brasília); fora desse horário o app mostra que o demo está offline.
+
+Código aberto: github.com/vanilds
